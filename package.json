@@ -1,0 +1,23 @@
+{
+  "name": "svg-to-webicons",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "npm-watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "png-to-ico": "^1.0.2",
+    "svg2png": "^4.1.1"
+  },
+  "watch": {
+    "start": "index.js"
+  },
+  "devDependencies": {
+    "npm-watch": "^0.1.8"
+  }
+}
