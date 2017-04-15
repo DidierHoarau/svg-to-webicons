@@ -1,12 +1,16 @@
 const
   fs = require('fs'),
   svg2png = require("svg2png");
-  pnFs = require("pn/fs");
+  pnFs = require("pn/fs"),
+  toIco = require('to-ico');;
+
 
 const
   outputDir = 'output',
+  tmpDir = 'output/tmp',
   inputSvg = 'icon.svg'
   outputBaseName = 'icon-';
+
 
 console.log('SVG to Web Icons');
 
@@ -16,6 +20,7 @@ if (fs.existsSync(outputDir)) {
   rmDirSync(outputDir);
 }
 fs.mkdirSync(outputDir);
+fs.mkdirSync(tmpDir);
 
 
 // Check
@@ -37,7 +42,25 @@ for (let i=0 ; i<dimensions.length ; i++) {
     });
 }
 
+
 // Favicon
+generatePng(inputSvg, tmpDir + '/icon-16x16.png', { width: 16, height: 16 })
+  .then( () => {
+    return generatePng(inputSvg, tmpDir + '/icon-32x32.png', { width: 32, height: 32 });
+  }).then( () => {
+    const filesPngs = [
+      fs.readFileSync(tmpDir + '/icon-16x16.png'),
+      fs.readFileSync(tmpDir + '/icon-32x32.png')
+    ];
+    return toIco(filesPngs);
+  }).then( (buffer) => {
+    fs.writeFileSync(outputDir + '/favicon.ico', buffer);
+    rmDirSync(tmpDir);
+  }).catch( (error) => {
+    console.error('Error: ' + error);
+    process.exit(1);
+  });
+
 
 
 /**
@@ -50,6 +73,8 @@ function generatePng(inputPath, outputPath, options) {
         return svg2png(buffer, options);
       }).then( (buffer) => {
         return pnFs.writeFile(outputPath, buffer);
+      }).then( () => {
+        resolve();
       }).catch( (error) => {
         console.error(error);
         reject(error);
